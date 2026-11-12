@@ -1,0 +1,195 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Barlow Semi Condensed", ui-sans-serif, system-ui, sans-serif;
+  --font-painel: "Barlow Condensed", "Barlow Semi Condensed", ui-sans-serif, system-ui, sans-serif;
+
+  --color-noite: oklch(0.165 0.026 258);
+  --color-moldura: oklch(0.2 0.027 258);
+  --color-placa: oklch(0.235 0.024 258);
+  --color-placa-alta: oklch(0.275 0.024 258);
+  --color-junta: oklch(0.13 0.022 258);
+  --color-regua: oklch(0.335 0.022 258);
+  --color-regua-forte: oklch(0.42 0.022 258);
+
+  --color-tinta: oklch(0.955 0.012 85);
+  --color-tinta-2: oklch(0.8 0.018 250);
+  --color-tinta-3: oklch(0.68 0.02 250);
+
+  --color-melhor: oklch(0.88 0.165 95);
+  --color-melhor-tinta: oklch(0.2 0.04 95);
+  --color-ok: oklch(0.8 0.15 152);
+  --color-atencao: oklch(0.79 0.15 62);
+  --color-critico: oklch(0.72 0.18 25);
+  --color-falha: oklch(0.72 0.02 250);
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    background-color: var(--color-noite);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background-color: var(--color-noite);
+    color: var(--color-tinta);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Mantém os algarismos com a mesma largura nas colunas. */
+  .numeros {
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  ::selection {
+    background-color: var(--color-tinta);
+    color: var(--color-noite);
+  }
+
+  input,
+  button,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+
+  input {
+    caret-color: var(--color-tinta);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-tinta);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  a {
+    color: var(--color-tinta);
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1px;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-regua-forte) transparent;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+@layer components {
+  .placa {
+    background-color: var(--color-placa);
+  }
+
+  .palheta {
+    display: inline-grid;
+    place-items: center;
+    min-width: 0.95em;
+    padding: 0.14em 0.1em 0.1em;
+    border-radius: 3px;
+    background-color: oklch(0.27 0.024 258);
+    background-image: linear-gradient(
+      to bottom,
+      oklch(0.3 0.024 258) 0,
+      oklch(0.275 0.024 258) calc(50% - 1px),
+      oklch(0.1 0.02 258) calc(50% - 1px),
+      oklch(0.1 0.02 258) calc(50% + 0.5px),
+      oklch(0.255 0.024 258) calc(50% + 0.5px),
+      oklch(0.235 0.024 258) 100%
+    );
+    box-shadow: 0 1px 0 oklch(0.1 0.02 258), inset 0 1px 0 oklch(0.36 0.024 258 / 0.6);
+    font-family: var(--font-painel);
+    line-height: 1;
+  }
+
+  .palheta-palavra {
+    background-image: linear-gradient(
+      to bottom,
+      oklch(0.29 0.024 258) 0,
+      oklch(0.27 0.024 258) calc(50% - 0.5px),
+      oklch(0.215 0.022 258) calc(50% - 0.5px),
+      oklch(0.215 0.022 258) calc(50% + 0.5px),
+      oklch(0.25 0.024 258) calc(50% + 0.5px),
+      oklch(0.235 0.024 258) 100%
+    );
+  }
+}
+
+/* Fora das camadas do Tailwind para prevalecer sobre as classes de borda. */
+@media (width >= 80rem) {
+  .regua-esquerda {
+    border-left: 1px solid var(--color-regua);
+  }
+  .regua-baixo {
+    border-bottom: 1px solid var(--color-regua);
+  }
+}
+
+@media (width >= 80rem) and (min-resolution: 2dppx) {
+  .regua-esquerda {
+    border-left-width: 0.5px;
+  }
+  .regua-baixo {
+    border-bottom-width: 0.5px;
+  }
+}
+
+/* TextoPalheta reinicia esta animação quando o valor muda. */
+@keyframes virar-palheta {
+  from {
+    transform: perspective(240px) rotateX(-82deg);
+    opacity: 0.25;
+  }
+  to {
+    transform: perspective(240px) rotateX(0deg);
+    opacity: 1;
+  }
+}
+
+.virando {
+  display: inline-block;
+  transform-origin: 50% 0;
+  animation: virar-palheta 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Entrada escalonada das linhas ao trocar de atividade. */
+@keyframes entrar-linha {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.linha-entrando {
+  animation: entrar-linha 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--ordem, 0) * 28ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .virando,
+  .linha-entrando {
+    animation: none;
+  }
+}

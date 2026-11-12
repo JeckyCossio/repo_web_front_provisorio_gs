@@ -1,49 +1,91 @@
-# Uso de Inteligência Artificial
+# Uso de Inteligência Artificial: Study Comfort
 
 ## 1. Ferramentas utilizadas
 
-- **Claude Code** (Anthropic): planejamento das etapas, geração de código e de testes, revisão.
-- **Codex** (OpenAI): ajuste da origem dos dados da S01, remoção da simulação local dessa sala e atualização do README, a pedido do grupo.
+| Ferramenta | Finalidade |
+|---|---|
+| Claude | Discussão do escopo com a skill `grill-me`, principalmente para brainstorming: objetivo do projeto, tecnologias, viabilidade das funcionalidades, ocupação das mesas e integração entre circuito e aplicação web. As decisões foram organizadas em `contexto.md`, usado como referência na revisão do projeto. |
+| GitHub Copilot (Modo auto)| Revisão do código a partir do `contexto.md` e conferência dos requisitos e entregáveis de Front-end Design e Web Development. |
 
-## 2. Interações realizadas
+## 2. Exemplos representativos de interações
 
-Exemplos representativos (resumidos):
+Os exemplos resumem os pedidos e as orientações discutidas, sem reproduzir todas as mensagens ou os textos exatos.
 
-- **Pedido:** ler o edital e o documento de contexto do grupo e planejar a parte web, apontando o que depende das outras partes. **Resposta:** um plano por etapas e a lista do que precisa ser combinado com o Edge (o formato dos dados da sala S01) e com o grupo (os limiares de conforto).
-- **Pedido:** montar a base do projeto e seguir as etapas, com o código explicado por escrito. **Resposta:** o projeto React + Vite + Tailwind configurado, o código de cada etapa com testes e um documento explicando cada arquivo.
+### 2.1. Claude: definição do escopo
 
-## 3. Aplicação no projeto
+#### Exemplo 1: disponibilidade de lugares e utilidade para o estudante
 
-A IA ajudou a planejar as etapas a partir do edital e do documento de contexto do grupo, configurou a base do projeto (React + Vite + Tailwind + Vitest) e gerou o código da aplicação e os testes a partir dos requisitos e das regras definidos pelo grupo.
+**Prompt representativo:**
 
-## 4. Validação das respostas
+> Considerando os dois PDFs que eu te passei que tem o contexto do projeto que temos que construir (GS), quero que você em ajude definir com mais detalhes a nossa ideia par ao projeto que tivemos com o meu grupo e nos ajude a tampar as lacunas também, nossa ideia é construir um sistema onde os dados de temperatura, ruído, luminosidade e ocupação de uma sala sejam captados por sensores (no prototipo que estamos construindo os sensores estarão no prototipo no wokwi), apartir daí enviaremos esse dados para o supabase e depois o painel de web/front irá consultar os dados que estarão no supabase. Usando a skill /grill-me faça perguntas para identificar lacunas e ajudar a definir um escopo viável para a GS.
 
-Testes automatizados (Vitest), build e lint a cada etapa; testes manuais no navegador; leitura do código com uma explicação por escrito de cada parte, para o integrante entender e saber explicar o que foi feito.
+**Resumo da resposta:**
 
-## 5. Análise crítica
+A partir daí o claude usou a skill grill-me para fazer algumas perguntas sobre tecnologias que queriamos usar, tipo de conexões com o supabase que usariamos, o escopo do nosso conhecimento, quem seriam as pessoas beneficiadas, como planejavamos implementar o CRUD, etc.
+No total foram mais ou menos 20 perguntas até conseguirmos definir o arquivo .md com o contexto total do projeto.
+Esse arquivo foi enviado para cada integrante do time para saber exatamente como seria construído o projeto com detalhes.
+Depois disso fizemos alguams alterações em grupo e no final conseguimos ter o nosso arquivo chamado contexto.md.
 
-> A escrever pelo grupo antes da entrega.
+### 2.2. GitHub Copilot: revisão do código
 
-## Atualização — simulações locais dinâmicas
+#### Exemplo 2: cadeiras vagas e mesas totalmente livres
 
-A pedido do grupo, o Codex implementou a variação gradual de S02–S09: luz e temperatura lentas e limitadas; ocupação por uma pessoa em uma mesa; ruído influenciado pela ocupação. A S01 permanece fora do simulador. Os testes conferem ritmos, limites, imutabilidade dos seeds e separação da telemetria.
+**Prompt representativo:**
 
-## Atualização — recomendações de grupo e vídeo — 10/11/2026
+> Revise se as regras de ocupação e os atalhos de atividade que estão descritos no arquivo contexto.md estão sendo seguidos no prototipo web/front.
 
-O Codex ajustou as regras conforme a decisão do grupo: mesa totalmente livre obrigatória nos dois atalhos, mesma pontuação de mesas, limites de ruído distintos e vídeo com silêncio/mesas de pesos iguais, sem temperatura na nota. Também atualizou os testes, README e orientações de alinhamento com UX/slides.
+**Resumo da resposta:**
 
-## Nome do projeto — 10/11/2026
+O GitHub Copilot identificou que havia algumas divergências em relação as regras para identificar salas boas para gravar videos e para fazer trabalhos em grupo, ou seja, no arquivo contexto.md haviam algumas regras para identificar essas salas que não estavam sendo seguidos firmimente no código do painel de web/front.
 
-O Codex aplicou o nome Study Comfort, definido pelo grupo, à interface, aos metadados e à documentação. A alteração preserva as regras de negócio e as chaves de armazenamento existentes.
+**Aplicação no projeto:**
 
-## Revisão editorial e técnica
+A revisão concentrou-se nas funções de ocupação e nos critérios do ranking. O resultado esperado foi manter as contagens separadas e impedir que uma sala sem mesa vazia participasse dos atalhos de grupo e vídeo.
 
-O Codex pesquisou limites da identificação de conteúdo gerado por IA e revisou a documentação e os comentários do código. A revisão reduziu repetições e corrigiu descrições antigas. O uso das ferramentas permanece registrado neste arquivo. O relatório auxiliar foi retirado do pacote de entrega.
+#### Exemplo 3: interpretação dos valores nos filtros
 
-## Alinhamento com o material das aulas — 10/11/2026
+**Prompt representativo:**
 
-A pedido do usuário, o Codex examinou os arquivos de `contexto_aulas/` e comparou os conteúdos com a implementação. Substituiu conversões de objetos, congelamento de constantes e validações com expressões regulares por objetos, arrays, laços e funções. As fontes passaram de pacotes Fontsource para arquivos locais com CSS e licenças. As regras de simulação e recomendação foram preservadas. O relatório auxiliar foi arquivado fora do repositório; ele não é um entregável das duas disciplinas. A revisão foi conferida com Vitest, lint, build, comparação de filtros/datas e testes locais no navegador.
+> Revise a conversão dos campos dos filtros. Quando escrevo `1.000` na iluminação, quero dizer mil lux. Confira também números com vírgula e o comportamento quando apago o campo, porque os resultados não estão correspondendo ao valor informado.
 
-## Reorganização para a entrega — 10/11/2026
+**Resumo da resposta:**
 
-O Codex reorganizou a aplicação em `frontend/`, seguindo os exemplos de projeto React das aulas. As telas passaram para `src/pages/` e as regras para `src/utils/`, mantendo componentes, custom hooks e serviços separados conforme o edital. Atualizou imports e instruções de execução. PDFs, exemplos das aulas e documentos auxiliares foram preservados fora do repositório. Os testes foram mantidos para validar a mudança.
+O GitHub Copilot identificou que uma conversão numérica direta pode interpretar `1.000` como um e transformar um campo vazio em zero. Sugeriu considerar os separadores usados em português e manter o campo apagado como ausência de limite. Indicou comparar entradas como `1.000`, `1.000,5` e `22,5`.
+
+**Aplicação no projeto:**
+
+A orientação foi usada na revisão da interpretação dos valores dos filtros, preservando a diferença entre um limite igual a zero e um limite não preenchido.
+
+### 2.3. GitHub Copilot - conferência dos entregáveis
+
+#### Exemplo 4 - CRUD imcompleto
+**Prompt representativo:**
+
+> Compare o repositório com os requisitos de Front-end Design e Web Development. Confira React com Vite, Tailwind, pelo menos oito componentes, `useState`, `useEffect`, dois custom hooks e a separação das responsabilidades. Veja também a consulta à API, o CRUD e as instruções do README. Mostre o que atende e o que depende de confirmação do grupo.
+
+**Resumo da resposta:**
+
+O GitHub Copilot organizou a conferência por requisito e destacou os quatro custom hooks existentes, porém faltava a operação Delete no CRUD, e identificou que o código estava pouco comentado.
+Com base nisso fizemos as correções cabíveis.
+Os itens externos, como ZIP, deploy e acesso dos professores ao repositório, ficaram sob responsabilidade da equipe.
+
+**Aplicação no projeto:**
+
+A conferência serviu para revisar a organização da aplicação e a documentação de execução. A equipe passou a distinguir os requisitos verificáveis no código daqueles que dependem da preparação da entrega.
+
+## 3. Validação das orientações
+
+As sugestões que obtivemos através da discussão com o claude usando a skill grill-me foram levadas ao grupo e marcamos um reunião para ver se essas sugestões eram as que mais se encaixavam para o escopo do projeto, no final fizemos algumas mudanças em relação a sugestão pura do Claude, e apartir daí começamos a construir os entregaveis de todas as materias.
+
+Agora as revisões que pedimos que o github copilot faça foram feitas sem alterar o código, então nós lemos o plano de alteração, implementamos e testamos o código para ver se as funcionalidades anteriores se mantinham e se os problemas relatados foram resolvidos também.
+
+Houve também uma revisão que pedimos que o github copilot faça em relação aos entregaveis de web/front, antes de pedir essa revisão nós mesmos já haviamos revisado tudo para ver se os entregaveis estavam todos presentes e usamos o github copilot apenas para complementar essa revisão e no final achamos coisas que estavam pendentes sim e corrigimos essas pendências.
+
+## 4. Análise crítica
+
+O Claude ajudou a identificar decisões que ainda estavam abertas, principalmente sobre ocupação, integração e limites do protótipo. Registrar essas escolhas em um contexto comum tornou a revisão posterior mais objetiva.
+
+O GitHub Copilot ajudou muito na parte da correção de código e detalhes finos, afinal em projetos sempre há pequenos detalhes que não são tão perceptiveis, tipo pequenos trechos de código mal implementados que parecem certos, mas provocam resultados diferentes do esperado, ou alguns entregaveis que ainda faltam no projeto, esses detalhes não foram identificados com correção puramente humana, mas puderam ser identificados por IA.
+
+Notamos que o idela é sempre discutir em grupo grandes mudanças ou decisões tomadas juntamente com IA, afinal a IA sugeriu fazer alguns scripts em python que aumentariam a complexidade do projeto, quando na realidade a integração com o supabase já estava ótima.
+Se houvessemos seguido as sugestões da IA segamente, com certeza o projeto estaria desnecessáriamente maior agora, aumentando a complexidade e diminuindo o controle sobre o projeto.

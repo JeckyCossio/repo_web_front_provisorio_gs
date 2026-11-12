@@ -1,35 +1,8 @@
-# dependências e build
+# Dependências instaladas
 node_modules/
+
+# Build gerado
 dist/
-coverage/
 
-# variáveis de ambiente (nunca no git; o modelo é o .env.example)
-.env
-.env.*
-!.env.example
-
-# o edital da FIAP fica só na máquina
-*.pdf
-
-# editor e sistema
-.vscode/
-.idea/
-.DS_Store
-Thumbs.db
-*.log
-.claude/settings.local.json
-
-# arquivos pessoais e de ferramentas: ficam só no PC
-.agents/
-.aws/
-.codex/
-.playwright-cli/
-CLAUDE.md
-AGENTS.md
-.impeccable/
-materiais-aula/
-docs/DECISIONS.md
-docs/NEXT_SESSION.md
-docs/PERGUNTAS.md
-docs/perguntas_dono.md
-docs/MENSAGEM_*.md
+# Configuração local do Supabase
+.env.local

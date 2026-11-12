@@ -7,13 +7,13 @@ Global Solution 2026.2 | FIAP | Engenharia de Software, 1º ano | Front-end Desi
 | Campo | Definição |
 |---|---|
 | Nome da solução | Study Comfort. |
-| Cidade e bairro | São Paulo/SP; o campus/bairro da FIAP para a observação ainda a identificar. |
+| Cidade e bairro | São Paulo/SP |
 | Cidadão beneficiado | Estudantes universitários que querem escolher um ambiente adequado para estudar, trabalhar em grupo ou gravar vídeos/projetos. |
 | Problema em uma frase | Estudantes têm dificuldade para identificar, antes de se deslocar, salas com espaço e condições adequadas de ruído, temperatura e luminosidade para suas atividades. |
-| Como funciona | O fluxo previsto é ESP32 simulado no Wokwi → Supabase → painel React para a S01. A conexão ainda será configurada. S02 a S09 usam simulações locais. O painel oferece filtros, recomendações, favoritos e listas no navegador. |
-| O que cada parte faz | Edge: leitura simulada e decisão local (LEDs); Supabase: guarda a última leitura da sala IoT; React/Web: exibição, filtros, rankings e CRUD local de listas; Python: simulação independente em terminal; Matemática: modelagem da ocupação; UX: requisitos e experiência; Storytelling: comunicação do valor. |
+| Como funciona | O fluxo da S01 (Sala 1) é ESP32 simulado no Wokwi → Supabase → painel React. A conexão local está configurada e a leitura pelo painel foi validada. S02 a S09 usam simulações locais. O painel oferece filtros, recomendações, favoritos e listas no navegador. |
+| O que cada parte faz | Edge: leitura simulada e decisão local (LEDs); Supabase: guarda o histórico da sala IoT; React/Web: exibição, filtros, rankings e CRUD local de listas.
 | Repositório | https://github.com/JeckyCossio/study-comfort (público) |
-| Indicador de impacto | Proposto, ainda não medido: redução do tempo para encontrar uma sala adequada; complementarmente, a proporção de escolhas bem-sucedidas e a satisfação com a recomendação. |
+| Indicador de impacto | Novas entrevistas com os usuários da plataforma, perguntando quanto tempo provavelmente foi economizado através do uso da plataforma, e quantas vezes por seman é usado a plataforma pelo usuário |
 | ODS conectados | ODS 4: Educação de Qualidade (principal: melhores condições para estudar); ODS 9: Indústria, Inovação e Infraestrutura (apoio: IoT aplicada à infraestrutura do campus); possivelmente ODS 11: Cidades e Comunidades Sustentáveis (uso eficiente de espaços coletivos). |
 
 ### Equipe
@@ -31,11 +31,14 @@ No Study Comfort, o estudante entra com uma matrícula e senha fictícias (login
 
 ### Origem dos dados
 
-A S01 está preparada para receber a telemetria do Wokwi pelo Supabase. A conexão ainda será configurada; até lá, o painel mostra “Aguardando a primeira leitura”. Essa sala não recebe simulação local.
+Apenas A S01 (Sala 01) recebe a telemetria do Wokwi pelo Supabase, as outras salas tem seus dados mudados por simulações locais, isso ocorre apenas para mostrar como o painel web se comporta com diferentes dados. A configuração local usa a URL e a chave publicável do projeto em `.env.local`, ignorado pelo Git. Em outra instalação, preencha essas variáveis; sem elas, o painel aguarda a conexão. Essa sala não recebe simulação local.
 
-Após a integração, o painel consultará o último registro da S01. Com o Wokwi desligado, os valores permanecerão estáticos, com o horário original e o aviso de leitura antiga. Falhas de consulta também preservam a última leitura recebida enquanto o painel estiver aberto. Uma nova consulta ao banco não atualiza a data do registro.
+O painel consulta a tabela `room_telemetry_history` que está no supabase, ordenando os dados por `measured_at` e `measurement_id` decrescentes, com limite de uma linha. 
+O Wokwi envia novas leituras com POST e o banco atribui o horário. Com o Wokwi desligado, os valores permanecerão estáticos, com o horário original e o aviso de leitura antiga. Falhas de consulta também preservam a última leitura recebida enquanto o painel estiver aberto. Uma nova consulta ao banco não atualiza a data do registro.
 
 As salas S02 a S09 usam dados fictícios gerados no navegador, sem sensores, Wokwi ou Supabase. A S01 receberá dados transmitidos por um circuito simulado no Wokwi, não medições físicas de uma sala. As unidades do projeto são °C, lux estimados e dB simulados.
+
+O protótipo de edge que envia os dados para o supabase está em [Study Comfort: S01 / Histórico](https://wokwi.com/projects/480352166150085633). 
 
 ### Períodos das simulações locais (S02 a S09)
 
@@ -141,11 +144,11 @@ A severidade da ocupação serve à situação ambiental geral; sua pontuação 
 
 Os rótulos de faixa baixo/médio/alto descrevem a quantidade, enquanto adequado/atenção/crítico descrevem a severidade. Os limites de faixa são: temperatura abaixo de 21 °C / 21 a 26 °C / acima de 26 °C; luz abaixo de 300 / 300 a 750 / acima de 750 lux estimados; ruído abaixo de 40 / 40 a 55 / acima de 55 dB simulados; ocupação abaixo de 35% / 35 a 70% / acima de 70%. Por isso, luz classificada como “alta” não é necessariamente crítica, e ocupação “baixa” não é um problema.
 
-As regras estão em `frontend/src/services/simulacaoLocal.js` (ritmos e limites), `frontend/src/data/salas.js` (valores iniciais), `frontend/src/utils/limiares.js` (avaliação ambiental) e `frontend/src/utils/ranking.js` (pesos, elegibilidade e pontuação).
+As regras estão em `src/services/simulacaoLocal.js` (ritmos e limites), `src/data/salas.js` (valores iniciais), `src/utils/limiares.js` (avaliação ambiental) e `src/utils/ranking.js` (pesos, elegibilidade e pontuação).
 
 ## Estado
 
-O painel, o login de demonstração, os filtros, os rankings, os favoritos e as listas estão implementados. Falta configurar e validar a integração Wokwi/Supabase da S01. Os limiares ambientais são provisórios e os pesos servem à demonstração acadêmica.
+O painel, o login de demonstração, os filtros, os rankings, os favoritos e as listas estão implementados. A integração local com Wokwi/Supabase da S01 está configurada, com publicação e leitura pelo painel verificadas. Os limiares ambientais são provisórios e os pesos servem à demonstração acadêmica.
 
 
 ## Pré-requisitos
@@ -157,21 +160,20 @@ O painel, o login de demonstração, os filtros, os rankings, os favoritos e as 
 
 ```bash
 git clone https://github.com/JeckyCossio/study-comfort.git
-cd study-comfort/frontend
+cd study-comfort
 npm install
-cp .env.example .env.local   # preencheremos a conexão com o Supabase depois
+cp .env.example .env.local   # preencher URL e chave publicável do Supabase
 npm run dev                  # abre em http://localhost:5173
 ```
 
-| Comando (em `frontend/`) | O que faz |
+| Comando (na raiz do projeto) | O que faz |
 |---|---|
 | `npm run dev` | servidor de desenvolvimento |
-| `npm test` | os testes (Vitest) |
-| `npm run build` | o build de produção em `frontend/dist/` |
+| `npm run build` | o build de produção em `dist/` |
 | `npm run lint` | o lint (ESLint) |
 | `npm run preview` | serve o build de produção |
 
-### Variáveis de ambiente (`frontend/.env.local`)
+### Variáveis de ambiente (`.env.local`)
 
 | Variável | Para quê |
 |---|---|
@@ -184,49 +186,29 @@ npm run dev                  # abre em http://localhost:5173
 ```text
 ├── README.md              descrição, regras e execução
 ├── AI.md                  registro de uso de IA
-└── frontend/              aplicação compartilhada por Front-end e Web
-    ├── package.json
-    ├── package-lock.json
-    ├── index.html
-    ├── vite.config.js
-    ├── eslint.config.js
-    ├── .env.example
-    ├── public/            favicon e arquivos públicos
-    └── src/
-        ├── App.jsx        alterna entre login e painel
-        ├── main.jsx       entrada do React
-        ├── index.css      estilos globais e Tailwind
-        ├── pages/         Login.jsx e Painel.jsx
-        ├── components/    elementos reutilizáveis da interface
-        ├── hooks/         estado e efeitos personalizados
-        ├── services/      Supabase, armazenamento e simulação
-        ├── utils/         regras e funções de cálculo/validação
-        ├── data/          metadados e valores iniciais das salas
-        └── assets/        fontes locais e suas licenças
+├── package.json
+├── package-lock.json
+├── index.html
+├── vite.config.js
+├── eslint.config.js
+├── .env.example
+├── supabase/migrations/   migração para histórico único
+├── public/                favicon e arquivos públicos
+└── src/                   aplicação compartilhada por Front-end e Web
+    ├── App.jsx            alterna entre login e painel
+    ├── main.jsx           entrada do React
+    ├── index.css          estilos globais e Tailwind
+    ├── pages/             Login.jsx e Painel.jsx
+    ├── components/        elementos reutilizáveis da interface
+    ├── hooks/             estado e efeitos personalizados
+    ├── services/          Supabase, armazenamento e simulação
+    ├── utils/             regras e funções de cálculo/validação
+    ├── data/              metadados e valores iniciais das salas
+    └── assets/            fontes locais e suas licenças
 ```
-
-Os arquivos `*.test.js` permanecem junto dos módulos para validar o desenvolvimento. Sua remoção será feita apenas quando solicitada.
-
-## Entrega de Front-end Design e Web Development
-
-A mesma aplicação atende às duas disciplinas, com entrega separada para cada professor. O edital exige React com Vite ou Next, Tailwind, pelo menos oito componentes, `useState`/`useEffect`, pelo menos dois custom hooks e separação entre apresentação, regras e acesso aos dados.
-
-O repositório atual foi criado como público a pedido do integrante. O checklist abaixo registra os requisitos do edital, que solicita repositório privado. O histórico deste repositório foi reiniciado; os commits anteriores não estão nele.
-
-Para a submissão, conferir:
-
-- Repositório GitHub privado atualizado, com pelo menos 15 commits significativos e acesso de escrita para os dois professores.
-- ZIP com os arquivos necessários para instalar e executar o projeto, incluindo `README.md`, `AI.md`, configurações, código e licenças dos assets. Excluir `node_modules`, `dist` e arquivos locais de credenciais.
-- Link do deploy, exigido explicitamente em Front-end Design. Deploy ainda não registrado neste README.
-- Integração Wokwi/Supabase da S01 configurada e demonstrada. Continua pendente.
-- Análise crítica do uso de IA preenchida pelo grupo em `AI.md`.
-
-O edital descreve API externa e CRUD. O projeto segue a orientação docente relatada pelo grupo: API para telemetria e CRUD local para listas/favoritos. A evidência dessa orientação deve acompanhar a preparação da entrega; não se trata de autorização explícita no texto do edital.
-
 
 ## Limitações assumidas
 
 - O login é fictício e só visual; não protege nada.
 - Listas e favoritos ficam no navegador: outro navegador ou perfil não os vê, e limpar os dados do site os apaga.
-- A chave publicável do Supabase ficará no navegador. Ao configurar a integração, a permissão de leitura da tabela deverá ser restrita à telemetria da S01.
-- Os limiares de conforto (temperatura, luz, ruído, ocupação) ainda são provisórios, até o grupo aprovar a tabela.
+- A chave publicável do Supabase ficará no navegador. A tabela usa RLS para permitir leitura e inserção somente da S01; a chave pública não pode editar/excluir o histórico nem definir o horário ou identificador da medição.
